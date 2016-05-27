@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="on">
+	<head>
+		<meta charset = "UTF-8">
+		<title>Space Invaders</title>
+
+		<script src="javascript/helpers.js"></script>
+
+		<style>
+		canvas {
+			background-color: #000;
+			display: block;
+			position: absolute;
+			margin: auto;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+		</style>
+	</head>
+	<body>
+
+		<header>
+			<h1>Space Invaders</h1>
+			<h2>By Jonathan Li and Emily Wong</h2>
+			<h2>Let the Space Drop</h2>
+		</header>
+		<script>
+
+			var screen;
+			var input;
+			var frames;
+			var alSprite;
+			var taSprite;
+			var aliens;
+			var dir;
+			var tank;
+			var bullets;
+			var bulletss;
+			var alSpeed;
+			var blackSprite;
+			var blacky;
+			var points = 0;
+			document.write("Currently tracking points...");
+
+			function main() {
+				screen = new Screen(510, 600);
+				input = new InputHandeler();
+
+				var imgInvad = new Image();
+				imgInvad.addEventListener("load", function() {
+					alSprite = new Sprite(this, 0, 0, 30, 30);
+
+					init();
+					run();
+
+				});
+				imgInvad.src = "res/space_invader.jpg"
+
+				var imgTank = new Image();
+				imgTank.addEventListener("load", function() {
+					taSprite = new Sprite(this, 0, 0, 66, 30);
+
+					init();
+					run();
+
+				});
+				imgTank.src = "res/tankpic.jpg"
+
+			};
+
+
+			function init() {
+				frames = 0;
+				spFrame = 0;
+				lvFrame = 20;
+				dir = 1;
+
+				tank = {
+					sprite: taSprite,
+					x: (screen.width - taSprite.w) / 2,
+					y: screen.height - (30 + taSprite.h)
+				}; 
+
+				bullets = [];
+				bulletss = [];
+				blacky = [];
+
+				alien = {
+					sprite: alSprite,
+					x: Math.floor((Math.random() * 440) + 30),
+					y: alSprite.y
+				}
+
+
+			};
+
+			function run() {
+				var loop = function() {
+					update();
+					render();
+
+					window.requestAnimationFrame(loop, screen.canvas);
+
+				};
+				window.requestAnimationFrame(loop, screen.canvas);
+
+			};
+
+			function update() {
+				if(input.isDown(37)){
+					tank.x -= 4;
+				}
+
+				if (input.isDown(39)){
+					tank.x += 4;
+				}
+
+				if (alien.y + 30 > 600) {
+					window.alert("An alien escaped! GAME OVER");
+					document.write("Points: " + points);
+					imgTank.src = "res/black.jpg";
+				}
+
+
+				tank.x = Math.max(Math.min(tank.x, screen.width - (taSprite.w)), 0);
+
+				if(input.isPressed(32)) {
+					bullets.push(new Bullet(tank.x + 31, tank.y, -8, 2, 6, "#fff"));
+					bulletss.push(new Bullet(tank.x + 31, tank.y + 8, -8, 2, 6, "#000"));
+					
+				}
+				for(var i = 0, len = bullets.length; i < len; i++) {
+					var b = bullets[i];
+					var c = bulletss[i];
+
+					b.update();
+					c.update();
+
+					if (b.y + b.height < 0 || b.y > screen.height) {
+						bullets.splice(i, 1);
+						bulletss.splice(i, 1);
+						i--;
+						len--;
+						continue;
+					}
+				}
+
+				for(var i = 0, len = bullets.length; i < len; i++) {
+					var b = bullets[i];
+					if(intersect (alien.x, alien.y, 30, 30, b.x, b.y, 2, 6)) {
+						blacky.splice(0, 1, new Bullet(alien.x, alien.y, 0, 30, 30, "#000"));
+						screen.drawBullet(blacky[0]);
+						points = points + 1;
+						alien.y = 0;
+						alien.x = Math.floor((Math.random() * 440) + 30);
+					}
+				}
+			};
+
+			function render() {
+				screen.drawSprite(alien.sprite, alien.x, alien.y);
+				alFall();
+				
+
+				screen.ctx.save();
+				for(var i = 0; i < bullets.length; i++) {
+					screen.drawBullet(bullets[i]);
+					screen.drawBullet(bulletss[i]);
+				}
+				screen.ctx.restore;
+				screen.drawSprite(tank.sprite, tank.x, tank.y);
+
+			};
+
+			function alFall() {
+				alSpeed = Math.floor((Math.random() * 3) + 1);
+				alien.y += alSpeed;
+				if(alien.y > screen.height) {
+					alien.y = 0;
+					alien.x = Math.floor((Math.random() * 440) + 30);
+					alSpeed = Math.floor((Math.random() * 8) + 1);
+				}
+
+			};
+			main();
+		</script>
+
+		
+	</body>
+</html>
