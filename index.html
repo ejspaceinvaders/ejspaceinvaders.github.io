@@ -156,7 +156,6 @@
 						blacky.splice(0, 1, new Bullet(alien.x, alien.y, 0, 30, 30, "#000"));
 						screen.drawBullet(blacky[0]);
 						points = points + 1;
-						alSpeed = alSpeed + 0.5;
 						alien.y = 0;
 						alien.x = Math.floor((Math.random() * 440) + 30);
 					}
@@ -179,12 +178,12 @@
 			};
 
 			function alFall() {
-				//alSpeed = Math.floor((Math.random() * 3) + 1);
+				alSpeed = (points + 1) * 0.5;
 				alien.y += alSpeed;
 				if(alien.y > screen.height) {
 					alien.y = 0;
 					alien.x = Math.floor((Math.random() * 440) + 30);
-					//alSpeed = Math.floor((Math.random() * 8) + 1);
+					alSpeed = (points + 1) * 0.5;
 				}
 
 			};
